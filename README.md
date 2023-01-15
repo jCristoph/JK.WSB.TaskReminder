@@ -30,3 +30,5 @@ Do przeprowadzania operacji na bazie danych użyto ORM w postaci EntityFramework
 Aplikacja kliencka komunikuje się z serwerem za pomocą REST API.
 Dalsze prace rozwojowe dla aplikacji to dodanie przypomnień mailowych, możliwość edycji konta, modernizacja widoków oraz większa interaktywność
 zadań i podzadań.
+
+Dokumentacja api jest dostępna pod adresem /swagger/index.html
