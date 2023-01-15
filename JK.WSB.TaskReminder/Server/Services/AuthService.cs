@@ -52,7 +52,7 @@ namespace JK.WSB.TaskReminder.Server.Services
         {
             var response = new ServiceResponse<int>();
 
-            var user = _userRepository.GetUserByEmailAsync(registerDto.Email!);
+            var user = await _userRepository.GetUserByEmailAsync(registerDto.Email!);
 
             if (user is null)
             {

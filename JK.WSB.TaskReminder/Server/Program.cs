@@ -7,10 +7,13 @@ using Microsoft.IdentityModel.Tokens;
 
 var builder = WebApplication.CreateBuilder(args);
 
+
+
 // Add services to the container.
 
 builder.Services.AddControllersWithViews();
 builder.Services.AddRazorPages();
+builder.Services.AddSwaggerGen();
 builder.Services.AddDbContext<DataContext>(options =>
     options.UseSqlServer(builder.Configuration.GetConnectionString("Database"),
     b => b.MigrationsAssembly("JK.WSB.TaskReminder.Server")));
@@ -44,6 +47,12 @@ builder.Services.AddScoped<IQuestService, QuestService>();
 builder.Services.AddScoped<IStepService, StepService>();
 
 var app = builder.Build();
+
+app.UseSwagger();
+app.UseSwaggerUI(c =>
+{
+    c.SwaggerEndpoint("/swagger/v1/swagger.json", "Blazor API V1");
+});
 
 // Configure the HTTP request pipeline.
 if (app.Environment.IsDevelopment())
