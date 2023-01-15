@@ -1,0 +1,43 @@
+﻿
+Microsoft Visual Studio Solution File, Format Version 12.00
+# Visual Studio Version 17
+VisualStudioVersion = 17.3.32922.545
+MinimumVisualStudioVersion = 10.0.40219.1
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "JK.WSB.TaskReminder.Server", "JK.WSB.TaskReminder\Server\JK.WSB.TaskReminder.Server.csproj", "{A3DFE327-DBF7-49BE-8D4C-71FC1C5FE097}"
+EndProject
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "JK.WSB.TaskReminder.Client", "JK.WSB.TaskReminder\Client\JK.WSB.TaskReminder.Client.csproj", "{481268D0-F322-4692-A5DD-FB809AF36DD3}"
+EndProject
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "JK.WSB.TaskReminder.Shared", "JK.WSB.TaskReminder\Shared\JK.WSB.TaskReminder.Shared.csproj", "{4A075B92-EA14-45D6-A923-36F8BAD257B5}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "JK.WSB.TaskReminder.Tests", "JK.WSB.TaskReminder\Tests\JK.WSB.TaskReminder.Tests.csproj", "{346B1A87-5058-4E57-8FB0-96D3D9591F54}"
+EndProject
+Global
+	GlobalSection(SolutionConfigurationPlatforms) = preSolution
+		Debug|Any CPU = Debug|Any CPU
+		Release|Any CPU = Release|Any CPU
+	EndGlobalSection
+	GlobalSection(ProjectConfigurationPlatforms) = postSolution
+		{A3DFE327-DBF7-49BE-8D4C-71FC1C5FE097}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{A3DFE327-DBF7-49BE-8D4C-71FC1C5FE097}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{A3DFE327-DBF7-49BE-8D4C-71FC1C5FE097}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{A3DFE327-DBF7-49BE-8D4C-71FC1C5FE097}.Release|Any CPU.Build.0 = Release|Any CPU
+		{481268D0-F322-4692-A5DD-FB809AF36DD3}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{481268D0-F322-4692-A5DD-FB809AF36DD3}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{481268D0-F322-4692-A5DD-FB809AF36DD3}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{481268D0-F322-4692-A5DD-FB809AF36DD3}.Release|Any CPU.Build.0 = Release|Any CPU
+		{4A075B92-EA14-45D6-A923-36F8BAD257B5}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{4A075B92-EA14-45D6-A923-36F8BAD257B5}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{4A075B92-EA14-45D6-A923-36F8BAD257B5}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{4A075B92-EA14-45D6-A923-36F8BAD257B5}.Release|Any CPU.Build.0 = Release|Any CPU
+		{346B1A87-5058-4E57-8FB0-96D3D9591F54}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{346B1A87-5058-4E57-8FB0-96D3D9591F54}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{346B1A87-5058-4E57-8FB0-96D3D9591F54}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{346B1A87-5058-4E57-8FB0-96D3D9591F54}.Release|Any CPU.Build.0 = Release|Any CPU
+	EndGlobalSection
+	GlobalSection(SolutionProperties) = preSolution
+		HideSolutionNode = FALSE
+	EndGlobalSection
+	GlobalSection(ExtensibilityGlobals) = postSolution
+		SolutionGuid = {EF272EB3-930A-46F9-9D57-FB3044A050AD}
+	EndGlobalSection
+EndGlobal

@@ -1,0 +1,77 @@
+﻿@page "/login"
+@inject HttpClient Http
+@inject AuthenticationStateProvider AuthStateProvider
+@inject ILocalStorageService LocalStorage
+@inject NavigationManager NavigationManager
+@using JK.WSB.TaskReminder.Shared.Dtos
+@using JK.WSB.TaskReminder.Shared.Models
+@using System.Text.Json
+@using System.Net;
+
+
+<h3>Login</h3>
+
+<EditForm Model="loginDto" OnSubmit="LogIn">
+    <div class="form-group">
+        <label for="Name">Email</label>
+        <InputText id="Name" @bind-Value=loginDto.Email class="form-control"/>
+    </div>
+    <div class="form-group">
+        <label for="Password">Password</label>
+        <InputText id="Password" type="password" @bind-Value=loginDto.Password class="form-control" />
+    </div>
+    <button type="submit" class="btn btn-primary">Login</button>
+</EditForm>
+
+@if (OpenPopup)
+{
+    <InfoPopup Title=@PopupTitle
+           Text=@PopupText
+           OnClose="@OnPopupClose">
+    </InfoPopup>
+}
+
+@code {
+    public bool OpenPopup { get; set; }
+    public string? PopupTitle { get; set; }
+    public string? PopupText { get; set; }
+
+    private LoginDto loginDto = new LoginDto();
+    private bool isSuccess;
+
+    private async Task LogIn()
+    {
+        var response = await Http.PostAsJsonAsync("api/User/Login", loginDto);
+        var serviceResponse = await response.Content.ReadFromJsonAsync<ServiceResponse<LoggedUserDto>>();
+        isSuccess = serviceResponse.Success;
+
+        if (!isSuccess)
+        {
+            PopupTitle = "Error";
+        }
+        else
+        {
+            PopupTitle = "Success";
+
+            var loggedUserDto = serviceResponse?.Data;
+
+            await LocalStorage.SetItemAsync("token", loggedUserDto?.Token);
+            await LocalStorage.SetItemAsync("userId", loggedUserDto?.Id);
+            await AuthStateProvider.GetAuthenticationStateAsync();
+        }
+
+        PopupText = serviceResponse?.Message;
+        OpenPopup = true;
+
+    }
+
+    private void OnPopupClose()
+    {
+        if (isSuccess)
+        {
+            NavigationManager.NavigateTo("quests");
+        }
+
+        OpenPopup = false;
+    }
+}

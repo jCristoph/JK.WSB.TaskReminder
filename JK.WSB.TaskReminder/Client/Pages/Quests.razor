@@ -1,0 +1,76 @@
+﻿@page "/quests"
+@using JK.WSB.TaskReminder.Shared.Dtos
+@using JK.WSB.TaskReminder.Shared.Models;
+@inject HttpClient Http
+@inject ILocalStorageService LocalStorage
+@inject NavigationManager NavigationManager
+
+<PageTitle>Quests</PageTitle>
+
+<h3>Quests</h3>
+
+<button @onclick="AddQuest" class="btn btn-primary">Add</button>
+
+@if (quests == null)
+{
+    <p><em>Loading...</em></p>
+}
+else
+{
+    <table class="table">
+        <thead>
+            <tr>
+                <th>Done</th>
+                <th>Name</th>
+                <th>Reminder Date</th>
+                <th>Deadline</th>
+                <th>Favoruite</th>
+                <th>Options</th>
+            </tr>
+        </thead>
+        <tbody>
+            @foreach (var quest in quests)
+            {
+                <tr>
+                    <td>@quest.IsDone</td>
+                    <td>@quest.Name</td>
+                    <td>@quest.RemindDate</td>
+                    <td>@quest.DeadLine)</td>
+                    <td>@quest.IsFavoruite</td>
+                    <td>
+                        <button @onclick="() => GetDetails(quest.Id)" class="btn btn-primary">Details</button>
+                        <button @onclick="() => Delete(quest.Id)" class="btn btn-primary">Delete</button>
+                    </td>
+                </tr>
+            }
+        </tbody>
+    </table>
+}
+
+@code {
+    private IEnumerable<Quest>? quests;
+
+    protected override async Task OnInitializedAsync()
+    {
+        var userId = await LocalStorage.GetItemAsync<Guid>("userId");
+
+        var result = await Http.GetFromJsonAsync<IEnumerable<Quest>>($"api/Quest/GetForUser/{userId}");
+        quests = result?.OrderBy(x => x.DeadLine).ThenBy(x => x.IsDone);
+    }
+
+    private void AddQuest()
+    {
+        NavigationManager.NavigateTo("addquestform");
+    }
+
+    private void GetDetails(Guid questId)
+    {
+        NavigationManager.NavigateTo($"quest/{questId}");
+    }
+
+    private async Task Delete(Guid questId)
+    {
+        var result = await Http.DeleteAsync($"api/Quest/RemoveQuest/{questId}");
+        NavigationManager.NavigateTo($"quests");
+    }
+}

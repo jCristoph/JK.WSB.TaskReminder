@@ -1,0 +1,119 @@
+﻿@page "/register"
+@using JK.WSB.TaskReminder.Shared.Dtos
+@using System.Text.Json
+@using System.Net
+@using JK.WSB.TaskReminder.Shared.Models;
+@inject HttpClient Http
+@inject NavigationManager NavigationManager
+
+
+
+<h3>Register</h3>
+
+<EditForm Model="registerDto" OnSubmit="RegisterUser">
+    <div class="form-group">
+        <label for="Name">Name</label>
+        <InputText id="Name" @bind-Value=registerDto.Name class="form-control" />
+    </div>
+    <div class="form-group">
+        <label for="FirstName">First Name</label>
+        <InputText id="FirstName" @bind-Value=registerDto.FirstName class="form-control" />
+    </div>
+    <div class="form-group">
+        <label for="LastName">Last Name</label>
+        <InputText id="LastName" @bind-Value=registerDto.LastName class="form-control" />
+    </div>
+    <div class="form-group">
+        <label for="Email">Email</label>
+        <InputText id="Email" @bind-Value=registerDto.Email class="form-control" />
+    </div>
+    <div class="form-group">
+        <label for="Password">Password</label>
+        <InputText id="Password" type="password" @bind-Value=password class="form-control" />
+    </div>
+    <div class="form-group">
+        <label for="PasswordRepeated">Repeat Password</label>
+        <InputText id="PasswordRepeated" type="password" @bind-Value=repeatedPassword class="form-control" />
+    </div>
+    <button type="submit" class="btn btn-primary">Register</button>
+</EditForm>
+
+@if (OpenPopup)
+{
+    <InfoPopup Title=@PopupTitle
+               Text=@PopupText
+                OnClose="@OnPopupClose">
+    </InfoPopup>
+}
+
+
+@code {
+    public bool OpenPopup { get; set; }
+    public string? PopupTitle { get; set; }
+    public string? PopupText { get; set; }
+
+    private RegisterDto registerDto = new RegisterDto();
+
+    private bool isSuccess;
+    private string? password;
+    private string? repeatedPassword;
+
+    private async Task RegisterUser()
+    {
+        if (IsPasswordValid())
+        {
+            registerDto.Password = password;
+            var response = await Http.PostAsJsonAsync("api/User/Register", registerDto);
+            var serviceResponse = await response.Content.ReadFromJsonAsync<ServiceResponse<int>>();
+            isSuccess = serviceResponse.Success;
+
+            if (!isSuccess)
+            {
+                PopupTitle = "Error";
+            }
+            else
+            {
+                PopupTitle = "Success";
+            }
+
+            PopupText = serviceResponse?.Message;
+        }
+        else
+        {
+            if (!isSuccess)
+            {
+                PopupTitle = "Error";
+            }
+        }
+
+        OpenPopup = true;
+    }
+
+    private bool IsPasswordValid()
+    {
+        bool result = true;
+
+        if (password != repeatedPassword)
+        {
+            PopupText = "Passwords are not equal";
+            result = false;
+        }
+        if (password?.Length < 8)
+        {
+            PopupText = "Password must have at least 8 chars";
+            result = false;
+        }
+
+        return result;
+    }
+
+    private void OnPopupClose()
+    {
+        if (isSuccess)
+        {
+            NavigationManager.NavigateTo("login");
+        }
+
+        OpenPopup = false;
+    }
+}

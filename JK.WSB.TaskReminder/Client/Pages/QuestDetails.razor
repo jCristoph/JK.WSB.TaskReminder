@@ -1,0 +1,179 @@
+﻿@page "/quest/{id:guid}"
+@using JK.WSB.TaskReminder.Shared.Dtos
+@using System.Text.Json
+@using System.Net
+@using JK.WSB.TaskReminder.Shared.Models;
+@inject HttpClient Http
+@inject ILocalStorageService LocalStorage
+@inject NavigationManager NavigationManager
+
+
+<PageTitle>Quest Details</PageTitle>
+
+@if (quest == null)
+{
+    <p><em>Loading quest details...</em></p>
+}
+else
+{
+    <EditForm Model="quest" OnSubmit="EditQuest">
+        <div class="form-group">
+            <label for="Name">Name</label>
+            <InputText id="Name" @bind-Value=quest.Name class="form-control" />
+        </div>
+        <div class="form-group">
+            <label for="RemindDate">Remind Date</label>
+            <InputDate Type="InputDateType.DateTimeLocal" id="RemindDate" @bind-Value=quest.RemindDate class="form-control" />
+        </div>
+        <div class="form-group">
+            <label for="DeadLine">DeadLine</label>
+            <InputDate Type="InputDateType.DateTimeLocal" id="DeadLine" @bind-Value=quest.DeadLine class="form-control" />
+        </div>
+        <div class="form-group">
+            <label for="Note">Note</label>
+            <InputTextArea id="Note" @bind-Value=quest.Note class="form-control" />
+        </div>
+        <div>
+            <label for="IsDone">Is Done</label>
+            <InputCheckbox id="IsDone" @bind-Value=quest.IsDone />
+        </div>
+        <div>
+            <label for="IsFavoruite">Is Favoruite</label>
+            <InputCheckbox id="IsFavoruite" @bind-Value=quest.IsFavoruite />
+        </div>
+
+
+        <button type="submit" class="btn btn-primary">Save Changes</button>
+    </EditForm>
+}
+
+<hr />
+
+<p>Add steps</p>
+
+
+<div>
+    <EditForm Model="step" OnSubmit="AddStep">
+        <div class="form-group">
+            <label for="Name">Name</label>
+            <InputText id="Name" @bind-Value=step.Name class="form-control" />
+        </div>
+        <div>
+            <label for="IsDone">Is Done</label>
+            <InputCheckbox id="IsDone" @bind-Value=step.IsDone />
+        </div>
+
+        <button type="submit" class="btn btn-primary">Add</button>
+    </EditForm>
+</div>
+
+@if (steps == null)
+{
+        <p><em>Loading steps...</em></p>
+}
+else
+{
+    <table class="table">
+        <thead>
+            <tr>
+                <th>Done</th>
+                <th>Name</th>
+                <th>Options</th>
+            </tr>
+        </thead>
+        <tbody>
+            @foreach (var step in steps)
+            {
+                <tr>
+                    <td>@step.IsDone</td>
+                    <td>@step.Name</td>
+                    <td>
+                        <button @onclick="() => DeleteStep(step.Id)" class="btn btn-primary">Delete</button>
+                    </td>
+                </tr>
+            }
+        </tbody>
+    </table>
+}
+
+@if (OpenPopup)
+{
+    <InfoPopup Title=@PopupTitle
+           Text=@PopupText
+           OnClose="@OnPopupClose">
+    </InfoPopup>
+}
+
+
+@code {
+    [Parameter]
+    public Guid Id { get; set; }
+    public bool OpenPopup { get; set; }
+    public string? PopupTitle { get; set; }
+    public string? PopupText { get; set; }
+
+    private Quest quest;
+    private StepDto step = new();
+    private IEnumerable<Step>? steps;
+    private bool isSuccess;
+
+    protected override async Task OnInitializedAsync()
+    {
+        await GetQuest();
+        await GetSteps();
+    }
+
+    private async Task EditQuest()
+    {
+        await Http.PutAsJsonAsync<Quest>($"api/Quest/UpdateQuest/{Id}", quest);
+
+        await GetQuest();
+    }
+
+    private async Task AddStep()
+    {
+        step.QuestId = Id;
+        var response = await Http.PostAsJsonAsync("api/Step/Add", step);
+        var serviceResponse = await response.Content.ReadFromJsonAsync<ServiceResponse<int>>();
+        isSuccess = serviceResponse.Success;
+
+        if (!isSuccess)
+        {
+            PopupTitle = "Error";
+        }
+        else
+        {
+            await GetSteps();
+            PopupTitle = "Success";
+        }
+
+        PopupText = serviceResponse?.Message;
+        OpenPopup = true;
+    }
+
+    private async Task DeleteStep(Guid stepId)
+    {
+        var result = await Http.DeleteAsync($"api/Step/RemoveStep/{stepId}");
+        NavigationManager.NavigateTo($"quest/{Id}");
+    }
+
+    private void OnPopupClose()
+    {
+        if (isSuccess)
+        {
+            NavigationManager.NavigateTo($"quest/{Id}");
+        }
+
+        OpenPopup = false;
+    }
+
+    private async Task GetQuest()
+    {
+        quest = await Http.GetFromJsonAsync<Quest>($"api/Quest/Get/{Id}");
+    }
+
+    private async Task GetSteps()
+    {
+        steps = await Http.GetFromJsonAsync<IEnumerable<Step>>($"api/Step/GetByQuestId/{Id}");
+    }
+}

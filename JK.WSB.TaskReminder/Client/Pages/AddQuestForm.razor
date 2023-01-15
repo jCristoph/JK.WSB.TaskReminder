@@ -1,0 +1,91 @@
+﻿@page "/addquestform"
+@using JK.WSB.TaskReminder.Shared.Dtos
+@using System.Text.Json
+@using System.Net
+@using JK.WSB.TaskReminder.Shared.Models;
+@inject HttpClient Http
+@inject ILocalStorageService LocalStorage
+@inject NavigationManager NavigationManager
+
+
+
+<h3>Add Quest</h3>
+
+<EditForm Model="questDto" OnSubmit="AddQuest">
+    <div class="form-group">
+        <label for="Name">Name</label>
+        <InputText id="Name" @bind-Value=questDto.Name class="form-control" />
+    </div>
+    <div class="form-group">
+        <label for="RemindDate">Remind Date</label>
+        <InputDate Type="InputDateType.DateTimeLocal" id="RemindDate" @bind-Value=questDto.RemindDate class="form-control" />
+    </div>
+    <div class="form-group">
+        <label for="DeadLine">DeadLine</label>
+        <InputDate Type="InputDateType.DateTimeLocal" id="DeadLine" @bind-Value=questDto.DeadLine class="form-control" />
+    </div>
+    <div class="form-group">
+        <label for="Note">Note</label>
+        <InputTextArea id="Note" @bind-Value=questDto.Note class="form-control" />
+    </div>
+    <div>
+        <label for="IsDone">Is Done</label>
+        <InputCheckbox id="IsDone" @bind-Value=questDto.IsDone />
+    </div>
+    <div>
+        <label for="IsFavoruite">Is Favoruite</label>
+        <InputCheckbox id="IsFavoruite" @bind-Value=questDto.IsFavoruite />
+    </div>
+
+
+    <button type="submit" class="btn btn-primary">Add</button>
+</EditForm>
+
+@if (OpenPopup)
+{
+    <InfoPopup Title=@PopupTitle
+           Text=@PopupText
+           OnClose="@OnPopupClose">
+    </InfoPopup>
+}
+
+
+@code {
+    public bool OpenPopup { get; set; }
+    public string? PopupTitle { get; set; }
+    public string? PopupText { get; set; }
+
+    public QuestDto questDto = new QuestDto();
+
+    private bool isSuccess;
+
+    private async Task AddQuest()
+    {
+        questDto.UserId = await LocalStorage.GetItemAsync<Guid>("userId");
+        var response = await Http.PostAsJsonAsync("api/Quest/Add", questDto);
+        var serviceResponse = await response.Content.ReadFromJsonAsync<ServiceResponse<int>>();
+        isSuccess = serviceResponse.Success;
+
+        if (!isSuccess)
+        {
+            PopupTitle = "Error";
+        }
+        else
+        {
+            PopupTitle = "Success";
+        }
+
+        PopupText = serviceResponse?.Message;
+        OpenPopup = true;
+    }
+
+    private void OnPopupClose()
+    {
+        if (isSuccess)
+        {
+            NavigationManager.NavigateTo("quests");
+        }
+
+        OpenPopup = false;
+    }
+}
