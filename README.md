@@ -32,3 +32,4 @@ Dalsze prace rozwojowe dla aplikacji to dodanie przypomnień mailowych, możliwo
 zadań i podzadań.
 
 Dokumentacja api jest dostępna pod adresem /swagger/index.html
+Diagram Bazy Danych znajudje się w projekcie Server w folderze Data
